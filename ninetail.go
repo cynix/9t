@@ -5,7 +5,9 @@ import (
 	"os"
 	"sync"
 
-	"github.com/mattn/go-colorable"
+	"github.com/admpub/tail"
+
+	colorable "github.com/mattn/go-colorable"
 )
 
 type NineTail struct {
@@ -15,6 +17,7 @@ type NineTail struct {
 
 type Config struct {
 	Colorize bool
+	*tail.Config
 }
 
 func Runner(filenames []string, config Config) (*NineTail, error) {
@@ -25,7 +28,7 @@ func Runner(filenames []string, config Config) (*NineTail, error) {
 		output = colorable.NewNonColorable(os.Stdout)
 	}
 
-	tailers, err := NewTailers(filenames)
+	tailers, err := NewTailers(filenames, config.Config)
 	if err != nil {
 		return nil, err
 	}

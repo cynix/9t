@@ -14,8 +14,13 @@ import (
 
 var (
 	// red, green, yellow, magenta, cyan
-	ansiColorCodes  = [...]int{31, 32, 33, 35, 36}
-	seekInfoOnStart = &tail.SeekInfo{Offset: 0, Whence: os.SEEK_END}
+	ansiColorCodes    = [...]int{31, 32, 33, 35, 36}
+	seekInfoOnStart   = &tail.SeekInfo{Offset: 0, Whence: os.SEEK_END}
+	TailDefaultConfig = &tail.Config{
+		Follow:   true,
+		Location: seekInfoOnStart,
+		Logger:   tail.DiscardingLogger,
+	}
 )
 
 //Tailer contains watches tailed files and contains per-file output parameters
@@ -28,12 +33,11 @@ type Tailer struct {
 //NewTailers creates slice of Tailers from file names.
 //Colors of file names are cycled through the list.
 //maxWidth is a maximum widht of passed file names, for nice alignment
-func NewTailers(filenames []string) ([]*Tailer, error) {
+func NewTailers(filenames []string, tailConfigs ...*tail.Config) ([]*Tailer, error) {
 	maxLength := maximumNameLength(filenames)
 	ts := make([]*Tailer, len(filenames))
-
 	for i, filename := range filenames {
-		t, err := newTailer(filename, getColorCode(i), maxLength)
+		t, err := newTailer(filename, getColorCode(i), maxLength, tailConfigs...)
 		if err != nil {
 			return nil, err
 		}
@@ -44,12 +48,22 @@ func NewTailers(filenames []string) ([]*Tailer, error) {
 	return ts, nil
 }
 
-func newTailer(filename string, colorCode int, maxWidth int) (*Tailer, error) {
-	t, err := tail.TailFile(filename, tail.Config{
-		Follow:   true,
-		Location: seekInfoOnStart,
-		Logger:   tail.DiscardingLogger,
-	})
+func newTailer(filename string, colorCode int, maxWidth int, tailConfigs ...*tail.Config) (*Tailer, error) {
+	var tailConfig *tail.Config
+	if len(tailConfigs) > 0 {
+		tailConfig = tailConfigs[0]
+	}
+	if tailConfig == nil {
+		tailConfig = TailDefaultConfig
+	} else {
+		if tailConfig.Location == nil {
+			tailConfig.Location = TailDefaultConfig.Location
+		}
+		if tailConfig.Logger == nil {
+			tailConfig.Logger = TailDefaultConfig.Logger
+		}
+	}
+	t, err := tail.TailFile(filename, *tailConfig)
 
 	if err != nil {
 		return nil, err
