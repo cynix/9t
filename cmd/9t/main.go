@@ -4,7 +4,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/gongo/9t"
+	ninetail "github.com/admpub/9t"
 )
 
 func main() {

@@ -8,8 +8,8 @@ import (
 
 	"strings"
 
-	"github.com/hpcloud/tail"
-	"github.com/mattn/go-runewidth"
+	"github.com/admpub/tail"
+	runewidth "github.com/mattn/go-runewidth"
 )
 
 var (
