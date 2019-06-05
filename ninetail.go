@@ -17,15 +17,20 @@ type NineTail struct {
 
 type Config struct {
 	Colorize bool
+	Writer   io.Writer
 	*tail.Config
 }
 
 func Runner(filenames []string, config Config) (*NineTail, error) {
 	var output io.Writer
-	if config.Colorize {
-		output = colorable.NewColorableStdout()
+	if config.Writer == nil {
+		if config.Colorize {
+			output = colorable.NewColorableStdout()
+		} else {
+			output = colorable.NewNonColorable(os.Stdout)
+		}
 	} else {
-		output = colorable.NewNonColorable(os.Stdout)
+		output = config.Writer
 	}
 
 	tailers, err := NewTailers(filenames, config.Config)
