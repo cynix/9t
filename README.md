@@ -36,7 +36,7 @@ Installation
 ------------------------------
 
 ```
-$ go get github.com/gongo/9t/cmd/9t
+$ go get github.com/admpub/9t/cmd/9t
 ```
 
 Motivation
