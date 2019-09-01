@@ -11,7 +11,7 @@ import (
 func main() {
 	filenames := os.Args[1:]
 
-	runner, err := ninetail.Runner(filenames, ninetail.Config{Config: &tail.Config{Follow: true, ReOpen: true}, Colorize: true}) // TODO use flags!!
+	runner, err := ninetail.Runner(filenames, ninetail.Config{Config: &tail.Config{ReOpen: true, Poll: true, Follow: true}, Colorize: true}) // TODO use flags!!
 	if err != nil {
 		log.Fatal(err)
 	}
